@@ -2,19 +2,24 @@ import dist.pyesoteric as pe
 import dist.pyesotericesoteric as pee
 import os
 
-while (src := input("IN: ")):
-    with open(src, "r", encoding="utf-8") as f:
+while (path := input("IN: ")):
+    with open(path, "r", encoding="latin-1") as f:
+        filename = os.path.splitext(os.path.basename(path))[0]
+        folder = os.path.join(os.path.dirname(path), filename)
+        if not os.path.exists(folder):
+            os.makefolders(folder)
+
         code = f.read()
-        dir = src.replace("\\", "/").split("/")
-        fname = dir[-1][:-3]
-        if len(dir) > 1:
-            dir = "/".join(dir[:-1])+"/"+fname+"/"
-        else:
-            dir = fname+"/"
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        with open(dir+fname+"esoteric.py", "w") as o:
-            o.write(pe.encode(code))
-        with open(dir+fname+"esoteric2.py", "w") as o:
-            o.write(pee.encode(code))
-        print("OUT: "+dir)
+        with open(os.path.join(folder, filename+"esoteric.py"), "w") as o:
+            encoded1 = pe.encode(code)
+            assert (len(set(code)) <= 9) or (code == pe.decode(encoded1))
+            o.write(encoded1)
+
+        with open(os.path.join(folder, filename+"esoteric2.py"), "w") as o:
+            encoded2 = pee.encode(code)
+            assert (len(set(code)) <= 9) or (code == pee.decode(encoded2))
+            o.write(encoded2)
+
+        assert encoded1 == encoded2
+        print("OUT: "+folder)
+
